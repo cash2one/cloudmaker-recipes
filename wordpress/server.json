@@ -1,0 +1,27 @@
+{
+    "digitalocean" : {
+        "security" : {
+            "digital_ocean_api_key" : "***"
+            ,"public_ssh_key" : "ssh-rsa *** user@mysite.com"
+        }, "provision": {
+            "name" : "myserver"
+            , "region" : "nyc3"
+            , "size" : "512mb"
+            , "image" :  "debian-7-0-x64"
+            , "backups" : false
+            , "dnsRecords" :["mysite.com","www.mysite.com"]
+        }
+    }, "mysql" : {
+        "root_password":"ch0r1z0"
+    }, "wordpress": {
+        "db_name": "wordpress"
+        , "db_user" : "wordpress"
+        , "db_password" : "***"
+    }, "aws" : {
+        "aws_access_key_id":"***"
+        ,"aws_secret_access_key" : "***"
+        , "default.region" : "us-east-1"
+    } , "backup" :{
+        "s3_bucket" : "s3://mysite-backups"
+    }
+}
