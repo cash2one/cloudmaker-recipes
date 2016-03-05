@@ -9,9 +9,9 @@ import subprocess
 import sys
 
 logging.basicConfig(level='INFO')
-subprocess.check_call(['apache2ctl','stop'])
+subprocess.check_call(['/usr/sbin/apache2ctl','stop'])
 try :
-    lsout = subprocess.check_output(['aws','s3','ls','{{BACKUP_S3_BUCKET}}'])
+    lsout = subprocess.check_output(['/usr/local/bin/aws','s3','ls','{{BACKUP_S3_BUCKET}}'])
     fileList = []
     for line in lsout.splitlines():
         fileList.append(line.split()[3])
@@ -25,14 +25,15 @@ try :
         logging.info('there are currently no backups - restore complete')
         sys.exit(0)   #EXIT
     
-    subprocess.check_call(['aws','s3','cp','{{BACKUP_S3_BUCKET}}/' + backupFile,'/root'])
+    subprocess.check_call(['/usr/local/bin/aws','s3','cp','{{BACKUP_S3_BUCKET}}' + backupFile,'/root'])
     logging.info('retrieved backup ' + backupFile + ' from s3')
     
-    subprocess.check_call(['tar','-C', '/root', '-xzf', '/root/' + backupFile])
+    subprocess.check_call(['/bin/tar','-C', '/root', '-xzf', '/root/' + backupFile])
     os.remove('/root/' + backupFile)
     
     with open('/root/backup/wordpress.sql') as sqlFile:
-        subprocess.check_call(['mysql','-u','root','-p{{MYSQL_ROOT_PASSWORD}}','{{WORDPRESS_DB_NAME}}'],stdin=sqlFile)
+        subprocess.check_call(['/usr/bin/mysql','-u','root','-p{{MYSQL_ROOT_PASSWORD}}','{{WORDPRESS_DB_NAME}}'],stdin=sqlFile)
+        logging.info('restored database')
     
     if os.path.isdir('/var/www'):
         shutil.rmtree('/var/www')
@@ -44,4 +45,4 @@ finally:
     if os.path.isdir('/root/backup'):
     	shutil.rmtree('/root/backup')
 
-    subprocess.check_call(['apache2ctl','start'])
+    subprocess.check_call(['/usr/sbin/apache2ctl','start'])

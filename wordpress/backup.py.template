@@ -8,7 +8,7 @@ import shutil
 import subprocess
 
 logging.basicConfig(level='INFO')
-subprocess.check_call(['apache2ctl','stop'])
+subprocess.check_call(['/usr/sbin/apache2ctl','stop'])
 try :
     if os.path.isdir('/root/backup'):
         raise Exception('backup directory exists, backup may be in progregss - exiting')
@@ -20,15 +20,15 @@ try :
     #need to parameterize the mysql username and password
     dumpfile = open('/root/backup/wordpress.sql','w')
     with dumpfile:
-        subprocess.check_call(['mysqldump','-u','root','{{MYSQL_ROOT_PASSWORD}}','{{WORDPRESS_DB_NAME}}'],stdout=dumpfile)
+        subprocess.check_call(['/usr/bin/mysqldump','-u','root','-p{{MYSQL_ROOT_PASSWORD}}','{{WORDPRESS_DB_NAME}}'],stdout=dumpfile)
         logging.info('dumped wordpress db')
         
     datestr = datetime.datetime.now().strftime('%Y%m%d-%H%M')
-    subprocess.check_call(['tar','-C', '/root', '-cf', datestr + '.tar', 'backup'])
-    subprocess.check_call(['gzip','/root/' + datestr + '.tar'])
+    subprocess.check_call(['/bin/tar','-C', '/root', '-cf', datestr + '.tar', 'backup'])
+    subprocess.check_call(['/bin/gzip','/root/' + datestr + '.tar'])
     logging.info('created backup: ' + datestr + '.tar.gz')
     
-    subprocess.check_call(['aws','s3','cp','/root/' + datestr + '.tar.gz','{{BACKUP_S3_BUCKET}}/' + datestr + '.tar.gz'])
+    subprocess.check_call(['/usr/local/bin/aws','s3','cp','/root/' + datestr + '.tar.gz','{{BACKUP_S3_BUCKET}}/' + datestr + '.tar.gz'])
     logging.info('uploaded backup to amazon s3')
     
     
@@ -36,4 +36,4 @@ finally:
     if os.path.isdir('/root/backup'):
     	shutil.rmtree('/root/backup')
 
-    subprocess.check_call(['apache2ctl','start'])
+    subprocess.check_call(['/usr/sbin/apache2ctl','start'])
