@@ -29,6 +29,7 @@ aptInstall('apache2')
 aptInstall('php5')
 aptInstall('php-pear')
 aptInstall('php5-mysql')
+aptInstall('php5-curl')
 subprocess.check_call(['pip','install','Jinja2'])
 
 wpdb = config['wordpress']['db_name']
